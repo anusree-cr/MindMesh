@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Business Job Registration – MindMesh</title>
+  <style>
+    :root{
+      --bg:#f5f7f6;
+      --card:#fff;
+      --primary:#2d6a4f;
+      --muted:#6b7280;
+      --radius:12px;
+      --shadow:0 8px 24px rgba(16,24,40,0.06);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:#111;
+    }
+    .wrap{
+      max-width:960px;
+      margin:20px auto;
+      padding:16px;
+    }
+    h1{margin-top:0;color:var(--primary);font-size:1.4rem;}
+    form.panel{
+      background:var(--card);
+      padding:20px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      margin-bottom:20px;
+    }
+    .row{display:flex;gap:12px;flex-wrap:wrap;}
+    .field{
+      flex:1;
+      min-width:160px;
+      display:flex;
+      flex-direction:column;
+      margin-bottom:12px;
+    }
+    label{font-size:.85rem;color:var(--muted);margin-bottom:6px;}
+    input,select{
+      padding:10px 12px;
+      border-radius:var(--radius);
+      border:1px solid #e6e9ee;
+      font-size:1rem;
+      outline:none;
+      background:transparent;
+    }
+    input:focus,select:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(45,106,79,0.06);
+    }
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    button.btn{
+      background:var(--primary);
+      color:#fff;
+      border:none;
+      padding:10px 16px;
+      border-radius:var(--radius);
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.btn.secondary{
+      background:#fff;
+      color:var(--primary);
+      border:1px solid #e6e9ee;
+    }
+    .note{font-size:.85rem;color:var(--muted);}
+    /* list of posted jobs */
+    #jobsList{display:grid;gap:14px;}
+    .job-card{
+      background:var(--card);
+      padding:14px;
+      border-radius:var(--radius);
+      box-shadow:0 4px 12px rgba(0,0,0,0.06);
+      border:1px solid rgba(0,0,0,0.03);
+    }
+    .job-card h3{margin:0 0 6px 0;color:var(--primary);}
+    .job-meta{font-size:.9rem;color:var(--muted);}
+    .job-meta span{display:inline-block;margin-right:10px;}
+    @media(max-width:640px){
+      .row{flex-direction:column;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Business Job Registration Portal</h1>
+
+  <form id="jobForm" class="panel" onsubmit="return false;">
+    <div class="row">
+      <div class="field">
+        <label for="businessName">Business Name *</label>
+        <input id="businessName" type="text" required>
+      </div>
+      <div class="field">
+        <label for="city">City / Location *</label>
+        <input id="city" type="text" required>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field" style="flex:2">
+        <label for="address">Business Address</label>
+        <input id="address" type="text">
+      </div>
+      <div class="field">
+        <label for="phone">Phone</label>
+        <input id="phone" type="tel">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="jobTitle">Job Title / Vacant Position *</label>
+        <input id="jobTitle" type="text" required>
+      </div>
+      <div class="field">
+        <label for="salary">Salary *</label>
+        <input id="salary" type="number" min="0" required>
+      </div>
+      <div class="field">
+        <label for="salaryType">Salary Type</label>
+        <select id="salaryType">
+          <option value="per_day">Per day</option>
+          <option value="per_hour">Per hour</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="workingHours">Working hours / day</label>
+        <input id="workingHours" type="text" placeholder="e.g. 9am–5pm">
+      </div>
+      <div class="field">
+        <label for="workingDays">Number of working days</label>
+        <input id="workingDays" type="number" min="1" max="7" value="6">
+      </div>
+      <div class="field" style="flex:2">
+        <label for="notes">Business Details / Description</label>
+        <input id="notes" type="text">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="submitBtn" class="btn" type="button">Submit</button>
+      <button id="clearBtn" class="btn secondary" type="button">Clear</button>
+      <span class="note">All entries are stored locally in your browser.</span>
+    </div>
+  </form>
+
+  <section>
+    <h2 style="color:var(--muted);margin-bottom:8px;">Registered Jobs</h2>
+    <div id="jobsList"></div>
+  </section>
+</div>
+
+<script>
+  const STORAGE_KEY = 'businessJobs_mindmesh';
+  let jobs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+  const els = {
+    businessName: document.getElementById('businessName'),
+    address: document.getElementById('address'),
+    phone: document.getElementById('phone'),
+    email: document.getElementById('email'),
+    jobTitle: document.getElementById('jobTitle'),
+    salary: document.getElementById('salary'),
+    salaryType: document.getElementById('salaryType'),
+    city: document.getElementById('city'),
+    workingHours: document.getElementById('workingHours'),
+    workingDays: document.getElementById('workingDays'),
+    notes: document.getElementById('notes'),
+    submitBtn: document.getElementById('submitBtn'),
+    clearBtn: document.getElementById('clearBtn'),
+    jobsList: document.getElementById('jobsList')
+  };
+
+  function saveJobs(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+  }
+
+  function renderJobs(){
+    const container = els.jobsList;
+    container.innerHTML = '';                 // clear container first
+    if(jobs.length === 0){
+      container.innerHTML = '<div class="job-card">No job postings yet.</div>';
+      return;
+    }
+    jobs.forEach(job => {
+      const div = document.createElement('div');
+      div.className = 'job-card';
+      div.innerHTML = `
+        <h3>${escape(job.business)}</h3>
+        <div class="job-meta">
+          <span><strong>Position:</strong> ${escape(job.jobTitle)}</span>
+          <span><strong>Loc:</strong> ${escape(job.city)}</span>
+          <span><strong>Salary:</strong> ${job.salary} ${job.salaryType === 'per_hour' ? '/hr' : '/day'}</span>
+        </div>
+        <div class="job-meta">
+          <span><strong>Days:</strong> ${job.workingDays}</span>
+          <span><strong>Hours/day:</strong> ${escape(job.workingHours)}</span>
+        </div>
+        <div class="job-meta">
+          <span><strong>Contact:</strong> ${escape(job.phone || job.email || '–')}</span>
+        </div>
+        <div class="job-meta">
+          <span><strong>Address:</strong> ${escape(job.address)}</span>
+        </div>
+        <div class="job-meta">
+          <span><strong>Notes:</strong> ${escape(job.notes)}</span>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function clearForm(){
+    ['businessName','address','phone','email','jobTitle','salary','workingHours','workingDays','notes','city']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    els.workingDays.value = 6;
+    els.salaryType.selectedIndex = 0;
+  }
+
+  function addJob(){
+    const business = els.businessName.value.trim();
+    const jobTitle = els.jobTitle.value.trim();
+    const salary = els.salary.value.trim();
+    const city = els.city.value.trim();
+    if(!business || !jobTitle || !salary || !city){
+      alert('Please fill in all required fields.');
+      return;
+    }
+    const job = {
+      id: Date.now(),
+      business,
+      address: els.address.value.trim(),
+      phone: els.phone.value.trim(),
+      email: els.email.value.trim(),
+      jobTitle,
+      salary: Number(salary),
+      salaryType: els.salaryType.value,
+      city,
+      workingHours: els.workingHours.value.trim(),
+      workingDays: Number(els.workingDays.value) || 0,
+      notes: els.notes.value.trim(),
+      postedAt: Date.now()
+    };
+    jobs.push(job);
+    saveJobs();
+    renderJobs();
+    clearForm();
+  }
+
+  els.submitBtn.addEventListener('click', addJob);
+  els.clearBtn.addEventListener('click', clearForm);
+
+  renderJobs();
+
+  function escape(str){
+    return String(str||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+</script>
+</body>
+</html>

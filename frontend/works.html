@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Job Opportunities – GramWorks</title>
+  <style>
+    :root{
+      --primary:#2d6a4f;
+      --muted:#555;
+      --bg:#f6f6f4;
+      --card:#fff;
+      --radius:12px;
+      --shadow:0 4px 12px rgba(0,0,0,0.08);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:#222;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header{
+      background:var(--primary);
+      color:#fff;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    header a.home{
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+      padding:6px 12px;
+      border-radius:8px;
+      background:rgba(255,255,255,0.1);
+    }
+    .search-wrap{
+      flex:1;
+    }
+    .search-wrap input{
+      width:100%;
+      padding:10px 14px;
+      border:none;
+      border-radius:30px;
+      font-size:1rem;
+      outline:none;
+    }
+    main.container{
+      flex:1;
+      padding:20px;
+      max-width:1000px;
+      margin:0 auto;
+    }
+    #jobsContainer{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:18px;
+    }
+    .job-card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      cursor:pointer;
+      transition:transform .2s;
+    }
+    .job-card:hover{transform:translateY(-2px);}
+    .job-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .job-header h3{
+      margin:0;
+      font-size:1.1rem;
+      color:var(--primary);
+    }
+    .job-basic{
+      font-size:0.9rem;
+      color:var(--muted);
+    }
+    .job-extra{
+      margin-top:8px;
+      font-size:0.9rem;
+      color:#333;
+      display:none;
+    }
+    .job-card.expanded .job-extra{display:block;}
+    @media (max-width:600px){
+      main.container{padding:12px;}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="home">🏠 Home</a>
+  <div class="search-wrap">
+    <input id="searchInput" type="search" placeholder="Search by skill, location or job title…">
+  </div>
+</header>
+
+<main class="container">
+  <div id="jobsContainer"></div>
+</main>
+
+<script>
+  const jobs = [
+    {
+      business:"Green Grove Bakery",
+      address:"Market Road, Kozhikode",
+      contact:"Call 0495‑1234567 – bakery@grovegrove.com",
+      title:"Baker / Pastry chef",
+      days:5,
+      hours:"6am‑2pm",
+      salary:"₹800/day",
+      skills:["Baking","Pastry"]
+    },
+    {
+      business:"Sunny Tutors",
+      address:"Palayam, Thiruvananthapuram",
+      contact:"9667991122 – sunnytutors@gmail.com",
+      title:"Maths tutor",
+      days:6,
+      hours:"3pm‑7pm",
+      salary:"₹200/hr",
+      skills:["Maths","Teaching"]
+    },
+    {
+      business:"Oceanic Plumbing",
+      address:"Kochi Wharf, Ernakulam",
+      contact:"9446009876 – jobs@oceanicplumb.com",
+      title:"Assistant plumber",
+      days:6,
+      hours:"8am‑5pm",
+      salary:"₹180/hr",
+      skills:["Plumbing"]
+    },
+    {
+      business:"Sree Arts Studio",
+      address:"Fort Kochi",
+      contact:"8521523344 – sreeart@studio.com",
+      title:"Painter / Decorator",
+      days:5,
+      hours:"9am‑4pm",
+      salary:"₹150/hr",
+      skills:["Painting","Design"]
+    },
+    {
+      business:"EduKids Daycare",
+      address:"Vyttila, Kochi",
+      contact:"0474‑2233110 – hr@edukids.com",
+      title:"Caretaker",
+      days:6,
+      hours:"8am‑2pm",
+      salary:"₹600/day",
+      skills:["Childcare"]
+    },
+    {
+      business:"Green Lawn Landscaping",
+      address:"Thrissur City",
+      contact:"9847003321 – lawncare@greenlawn.com",
+      title:"Gardener",
+      days:5,
+      hours:"7am‑3pm",
+      salary:"₹140/hr",
+      skills:["Gardening"]
+    },
+    {
+      business:"QuickFix Electricals",
+      address:"Kollam",
+      contact:"9445123345 – quickfix@electricals.com",
+      title:"Electrician helper",
+      days:6,
+      hours:"9am‑6pm",
+      salary:"₹170/hr",
+      skills:["Electrical"]
+    },
+    {
+      business:"Spark IT Solutions",
+      address:"Infopark, Kochi",
+      contact:"0484‑2334455 – hr@sparkit.com",
+      title:"Data entry operator",
+      days:5,
+      hours:"10am‑6pm",
+      salary:"₹120/hr",
+      skills:["Computer","Typing"]
+    },
+    {
+      business:"Kerala Cabs",
+      address:"Kaloor, Ernakulam",
+      contact:"9061122334 – admin@keralacabs.com",
+      title:"Driver (small vehicle)",
+      days:6,
+      hours:"8am‑8pm",
+      salary:"₹900/day",
+      skills:["Driving"]
+    },
+    {
+      business:"Healthy Bites",
+      address:"Munnar",
+      contact:"9567123450 – healthybites@food.com",
+      title:"Cook helper",
+      days:5,
+      hours:"6am‑2pm",
+      salary:"₹150/hr",
+      skills:["Cooking"]
+    }
+  ];
+
+  function renderJobs(list){
+    const container = document.getElementById('jobsContainer');
+    container.innerHTML = '';
+    list.forEach(job=>{
+      const card = document.createElement('div');
+      card.className='job-card';
+      card.innerHTML=`
+        <div class="job-header">
+          <h3>${job.title}</h3>
+          <span class="job-basic">${job.salary}</span>
+        </div>
+        <div class="job-basic">${job.business}, ${job.address}</div>
+        <div class="job-basic">${job.days} days · ${job.hours}</div>
+        <div class="job-extra">
+          <p><strong>Contact:</strong> ${job.contact}</p>
+          <p><strong>Skills:</strong> ${job.skills.join(', ')}</p>
+        </div>
+      `;
+      card.addEventListener('click',()=>{
+        card.classList.toggle('expanded');
+      });
+      container.appendChild(card);
+    });
+  }
+
+  function filteredJobs(){
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    if(!q) return jobs;
+    return jobs.filter(j=>{
+      if(j.title.toLowerCase().includes(q)) return true;
+      if(j.business.toLowerCase().includes(q)) return true;
+      if(j.address.toLowerCase().includes(q)) return true;
+      if(j.skills.some(s=>s.toLowerCase().includes(q))) return true;
+      return false;
+    });
+  }
+
+  document.getElementById('searchInput').addEventListener('input',()=>{
+    renderJobs(filteredJobs());
+  });
+
+  renderJobs(jobs);
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Book Now – GramWorks</title>
+  <style>
+    :root{
+      --primary:#2d6a4f;
+      --accent:#d4a574;
+      --muted:#7a7a7a;
+      --bg:#f6f6f4;
+      --card:#fff;
+      --radius:14px;
+      --shadow:0 6px 18px rgba(16,24,40,0.08);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:#111;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header.appbar{
+      background:linear-gradient(90deg,var(--primary),#4aa77a);
+      color:#fff;
+      padding:12px 16px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .home-link{ /* …same as earlier… */ }
+    .search{ /* … */ }
+    .search input{/* … */}
+    main{flex:1;padding:18px;max-width:1100px;margin:0 auto;width:100%;}
+    .grid{display:grid;grid-template-columns:1fr;gap:18px;}
+    @media(min-width:900px){.grid{grid-template-columns:2fr 1fr;}}
+    .panel{background:var(--card);padding:14px;border-radius:var(--radius);box-shadow:var(--shadow);}
+    .panel h2{margin:0 0 12px;font-size:18px;color:var(--primary);}
+    #workersContainer{/* … */}
+    .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06);display:flex;flex-direction:column;gap:8px;position:relative;border:1px solid rgba(16,24,40,0.03);}
+    .title{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .heart{/* … */}.heart.liked{color:#e25555;}
+    .meta{font-size:0.92rem;color:var(--muted);} .meta strong{color:#222;font-weight:600;}
+    .skills{font-size:0.95rem;color:#2b5d3f;font-weight:600;}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .contact,.avail,.budget{font-size:0.9rem;color:#333;}
+    .btn-book{margin-top:6px;padding:6px 12px;font-size:0.9rem;border:none;border-radius:8px;background:var(--primary);color:#fff;cursor:pointer;align-self:flex-start;transition:background .3s;}
+    .btn-book:hover{background:#24603f;}
+    .right-col{display:flex;flex-direction:column;gap:12px;}
+    .liked-panel,#historySection{min-height:120px;}
+    .empty{color:var(--muted);padding:18px;text-align:center;border-radius:10px;background:rgba(45,106,79,0.04);}
+    nav.bottom{position:sticky;bottom:0;left:0;right:0;background:#fff;border-top:1px solid rgba(16,24,40,0.06);display:flex;justify-content:space-around;padding:8px 0;z-index:30;}
+    nav.bottom a{text-decoration:none;color:var(--primary);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 10px;}
+    nav.bottom a span.icon{font-size:20px;}
+    .badge{background:#e25555;color:#fff;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;}
+  </style>
+</head>
+<body>
+
+  <header class="appbar">
+    <a class="home-link" href="index.html">🏠 Home</a>
+    <div class="search" style="flex:1;">
+      <input id="searchInput" type="search" placeholder="Search…">
+    </div>
+    <button id="likedCountBtn" title="Liked" style="background:transparent;border:none;color:#fff;">
+      ❤️ <span id="likedCount" class="badge" style="background:#fff;color:var(--primary);">0</span>
+    </button>
+  </header>
+
+  <main>
+    <!-- history panel -->
+    <section class="panel" id="historySection" style="display:none;">
+      <h2>History</h2>
+      <div id="historyList"><div class="empty">No history</div></div>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Available Workers</h2>
+        <div id="workersContainer"></div>
+      </section>
+      <aside class="right-col">
+        <div class="panel liked-panel" id="likedPanel">
+          <h2>Liked Workers</h2>
+          <div id="likedList"><div class="empty">No liked workers yet.</div></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <nav class="bottom" role="navigation" aria-label="Bottom nav">
+    <a href="index.html" id="navHome"><span class="icon">🏠</span>Home</a>
+    <a href="#" id="navHistory"><span class="icon">📜</span>History</a>
+    <a href="#" id="navAccount"><span class="icon">👤</span>Account</a>
+    <a href="#" id="navLiked"><span class="icon">❤️</span>Liked</a>
+  </nav>
+
+  <script>
+    const workersDB = [
+      { id:1,name:"Nikhil Menon",skills:["Electrical"],location:"Kochi",contact:{phone:"9447001122"},availability:"Mon–Fri 8‑6",budget:180 },
+      { id:2,name:"Aswathy Nair",skills:["Tuition"],location:"Thiruvananthapuram",contact:{phone:"9567123345"},availability:"Tue–Sat 3‑8",budget:200 },
+      /* …eight more entries… */
+    ];
+
+    let likedSet = new Set(JSON.parse(localStorage.getItem('likedWorkers')||'[]'));
+    let historyList = JSON.parse(localStorage.getItem('history')||'[]'); // store ids
+    const workersContainer = document.getElementById('workersContainer');
+    const likedListEl       = document.getElementById('likedList');
+    const likedCountEl      = document.getElementById('likedCount');
+    const searchInput       = document.getElementById('searchInput');
+    const historySection    = document.getElementById('historySection');
+    const historyListEl     = document.getElementById('historyList');
+
+    function escapeHtml(str){return String(str||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));}
+
+    function renderWorkers(list=workersDB){
+      workersContainer.innerHTML='';
+      list.forEach(w=>{
+        const card=document.createElement('article');
+        card.className='card';
+        card.innerHTML=`
+          <div class="title">
+            <h3>${escapeHtml(w.name)}</h3>
+            <button class="heart ${likedSet.has(w.id)?'liked':''}" data-id="${w.id}">${likedSet.has(w.id)?'❤️':'🤍'}</button>
+          </div>
+          <div class="skills">${escapeHtml(w.skills.join(', '))}</div>
+          <div class="meta"><strong>Location:</strong> ${escapeHtml(w.location)}</div>
+          <div class="contact"><strong>Phone:</strong> ${escapeHtml(w.contact.phone)}</div>
+          <div class="avail"><strong>Availability:</strong> ${escapeHtml(w.availability)}</div>
+          <div class="budget"><strong>Rate:</strong> ₹${w.budget}/hr</div>
+          <button class="btn-book" data-id="${w.id}">Book / Contact</button>
+        `;
+        workersContainer.appendChild(card);
+      });
+
+      workersContainer.querySelectorAll('.heart').forEach(b=>b.onclick=()=>{
+        toggleLike(Number(b.dataset.id));
+      });
+      workersContainer.querySelectorAll('.btn-book').forEach(b=>b.onclick=()=>{
+        addToHistory(Number(b.dataset.id));
+      });
+    }
+
+    function renderLikedSection(){
+      likedListEl.innerHTML='';
+      const ids=[...likedSet];
+      if(ids.length===0){ likedListEl.innerHTML='<div class="empty">No liked workers yet.</div>'; likedCountEl.textContent=0; return;}
+      likedCountEl.textContent=ids.length;
+      ids.forEach(id=>{
+        const w=workersDB.find(x=>x.id===id);
+        if(!w) return;
+        const c=document.createElement('div'); c.className='card';
+        c.innerHTML=`<div class="title"><h3>${escapeHtml(w.name)}</h3><button class="heart liked" data-id="${w.id}">❤️</button></div>
+                     <div class="meta"><strong>Skills:</strong> ${escapeHtml(w.skills.join(', '))}</div>
+                     <div class="meta"><strong>Location:</strong> ${escapeHtml(w.location)}</div>
+                     <div class="meta"><strong>Contact:</strong> ${escapeHtml(w.contact.phone)}</div>
+                     <div class="meta"><strong>Rate:</strong> ₹${w.budget}/hr</div>`;
+        likedListEl.appendChild(c);
+      });
+      likedListEl.querySelectorAll('.heart').forEach(b=>b.onclick=()=>{
+        toggleLike(Number(b.dataset.id));
+      });
+    }
+
+    function renderHistory(){
+      historyListEl.innerHTML='';
+      if(historyList.length===0){
+        historyListEl.innerHTML='<div class="empty">No history</div>';
+        return;
+      }
+      historyList.forEach(id=>{
+        const w=workersDB.find(x=>x.id===id); if(!w) return;
+        const c=document.createElement('div'); c.className='card'; c.style.marginBottom='10px';
+        c.innerHTML=`<div class="title"><h3>${escapeHtml(w.name)}</h3></div>
+                     <div class="meta"><strong>Skills:</strong> ${escapeHtml(w.skills.join(', '))}</div>
+                     <div class="meta"><strong>Location:</strong> ${escapeHtml(w.location)}</div>
+                     <div class="meta"><strong>Contact:</strong> ${escapeHtml(w.contact.phone)}</div>
+                     <div class="meta"><strong>Availability:</strong> ${escapeHtml(w.availability)}</div>
+                     <div class="meta"><strong>Rate:</strong> ₹${w.budget}/hr</div>`;
+        historyListEl.appendChild(c);
+      });
+    }
+
+    function toggleLike(id){
+      if(likedSet.has(id)) likedSet.delete(id); else likedSet.add(id);
+      localStorage.setItem('likedWorkers', JSON.stringify([...likedSet]));
+      renderWorkers(filteredWorkers());
+      renderLikedSection();
+    }
+
+    function addToHistory(id){
+      if(!historyList.includes(id)){
+        historyList.push(id);
+        localStorage.setItem('history', JSON.stringify(historyList));
+        renderHistory();
+      }
+      alert('Saved to history');
+    }
+
+    function filteredWorkers(){
+      const q=searchInput.value.trim().toLowerCase();
+      if(!q) return workersDB;
+      return workersDB.filter(w=>{
+        return w.name.toLowerCase().includes(q) ||
+               w.location.toLowerCase().includes(q) ||
+               w.skills.join(' ').toLowerCase().includes(q);
+      });
+    }
+
+    searchInput.addEventListener('input',()=>renderWorkers(filteredWorkers()));
+
+    document.getElementById('navHistory').addEventListener('click',e=>{
+      e.preventDefault();
+      historySection.style.display = historySection.style.display==='none'?'block':'none';
+      if(historySection.style.display==='block'){historySection.scrollIntoView({behavior:'smooth'});renderHistory();}
+    });
+    document.getElementById('navLiked').addEventListener('click',e=>{e.preventDefault();document.getElementById('likedPanel').scrollIntoView({behavior:'smooth'});});
+    document.getElementById('likedCountBtn').addEventListener('click',()=>document.getElementById('likedPanel').scrollIntoView({behavior:'smooth'}));
+
+    renderWorkers();
+    renderLikedSection();
+    renderHistory();
+  </script>
+</body>
+</html>
