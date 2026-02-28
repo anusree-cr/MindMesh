@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Worker - GramWorks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f1f8f4 0%, #f5ede0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2d6a4f;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* ===== FORM CARD ===== */
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== FORM GROUP ===== */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2d6a4f;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #fafafa;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #52b788;
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+            background-color: white;
+        }
+
+        /* ===== PHONE WITH OTP ===== */
+        .phone-otp-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .phone-otp-group .form-group {
+            margin-bottom: 0;
+        }
+
+        .phone-otp-group label {
+            grid-column: 1 / -1;
+            margin-bottom: 10px;
+        }
+
+        .phone-otp-group input[type="tel"] {
+            width: 100%;
+        }
+
+        .btn-send-otp {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
+        }
+
+        .btn-send-otp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(45, 106, 79, 0.3);
+        }
+
+        .btn-send-otp:active {
+            transform: translateY(0);
+        }
+
+        /* ===== OTP INPUT FIELD ===== */
+        .otp-field {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .otp-field label {
+            color: #2d6a4f;
+            margin-bottom: 10px;
+        }
+
+        .otp-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .otp-input-group input {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        .otp-input-group input:focus {
+            border-color: #52b788;
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+        }
+
+        /* ===== ADDRESS ===== */
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ===== SELECT DROPDOWN ===== */
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d6a4f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        /* ===== BUTTON GROUP ===== */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+            color: white;
+            grid-column: 1 / -1;
+            box-shadow: 0 4px 15px rgba(45, 106, 79, 0.2);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(45, 106, 79, 0.3);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 600px) {
+            .form-card {
+                padding: 30px 20px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .phone-otp-group {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-send-otp {
+                width: 100%;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .otp-input-group input {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* ===== SUCCESS MESSAGE (Hidden by default) ===== */
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* ===== ERROR MESSAGE (Hidden by default) ===== */
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f5222d;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            text-align: center;
+            color: #999;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🔨 Book a Worker</h1>
+            <p>Fill in your details to get started</p>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="form-card">
+            <!-- SUCCESS MESSAGE -->
+            <div class="success-message" id="successMsg">
+                ✓ Details submitted successfully! A worker will contact you soon.
+            </div>
+
+            <!-- ERROR MESSAGE -->
+            <div class="error-message" id="errorMsg">
+                ✗ Please fill in all required fields correctly.
+            </div>
+
+            <form id="bookingForm">
+                <!-- FULL NAME -->
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        name="fullName" 
+                        placeholder="Enter your full name" 
+                        required
+                    >
+                </div>
+
+                <!-- ADDRESS -->
+                <div class="form-group">
+                    <label for="address">Address *</label>
+                    <textarea 
+                        id="address" 
+                        name="address" 
+                        placeholder="Enter your complete address" 
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- PHONE WITH OTP -->
+                <div class="phone-otp-group">
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone" 
+                            placeholder="Enter 10-digit phone number" 
+                            pattern="[0-9]{10}" 
+                            required
+                        >
+                    </div>
+                    <button type="button" class="btn-send-otp" id="sendOtpBtn">Send OTP</button>
+                </div>
+
+                <!-- OTP VERIFICATION FIELD -->
+                <div class="otp-field" id="otpField" style="display: none;">
+                    <label>Enter OTP *</label>
+                    <div class="otp-input-group">
+                        <input type="text" maxlength="1" class="otp-input" inputmode="numeric" required>
+                        <input type="text" maxlength="1" class="otp-input" inputmode="numeric" required>
+                        <input type="text" maxlength="1" class="otp-input" inputmode="numeric" required>
+                        <input type="text" maxlength="1" class="otp-input" inputmode="numeric" required>
+                    </div>
+                </div>
+
+                <!-- LOCATION DROPDOWN -->
+                <div class="form-group">
+                    <label for="location">Select Location/Pincode *</label>
+                    <select id="location" name="location" required>
+                        <option value="">-- Choose your location --</option>
+                        <option value="660001">560001 - ERNAKULAM</option>
+                        <option value="660002">560002 - KOLLAM</option>
+                        <option value="660034">560034 - THRISSUR</option>
+                        <option value="660043">560043 - MALAPPURAM</option>
+                        <option value="660076">560076 - PALAKKAD</option>
+                        <option value="600001">400001 - KOZHIKODE</option>
+                        <option value="600050">400050 - KOTTAYAM</option>
+                        <option value="610001">110001 - WAYANAD</option>
+                        <option value="610019">110019 - KANNUR</option>
+                        <option value="650001">500001 - KASARKODE</option>
+                    </select>
+                </div>
+
+                <div class="divider">* Required fields</div>
+
+                <!-- BUTTONS -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-submit" onclick="window.location.href='book now.html'">Book Now</button>
+                    <button type="reset" class="btn btn-reset">Clear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // SEND OTP BUTTON
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+        const otpField = document.getElementById('otpField');
+        const phoneInput = document.getElementById('phone');
+        const form = document.getElementById('bookingForm');
+        const successMsg = document.getElementById('successMsg');
+        const errorMsg = document.getElementById('errorMsg');
+
+        sendOtpBtn.addEventListener('click', function() {
+            if (phoneInput.value.length === 10) {
+                otpField.style.display = 'block';
+                sendOtpBtn.textContent = 'OTP Sent ✓';
+                sendOtpBtn.disabled = true;
+                sendOtpBtn.style.opacity = '0.6';
+            } else {
+                alert('Please enter a valid 10-digit phone number');
+            }
+        });
+
+        // OTP INPUT - AUTO FOCUS
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // FORM SUBMISSION
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value;
+            const address = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('location').value;
+            const otpFilled = Array.from(otpInputs).every(input => input.value !== '');
+
+            // VALIDATION
+            if (!fullName || !address || !phone || !location) {
+                errorMsg.classList.add('show');
+                successMsg.classList.remove('show');
+                return;
+            }
+
+            if (otpField.style.display === 'block' && !otpFilled) {
+                errorMsg.textContent = '✗ Please enter the OTP sent to your phone.';
+                errorMsg.classList.add('show');
+                successMsg.classList.remove('show');
+                return;
+            }
+
+            // SUCCESS
+            successMsg.classList.add('show');
+            errorMsg.classList.remove('show');
+            console.log('Booking Details:', {
+                fullName, address, phone, location,
+                otp: Array.from(otpInputs).map(input => input.value).join('')
+            });
+
+            // RESET FORM AFTER 2 SECONDS
+            setTimeout(() => {
+                form.reset();
+                otpField.style.display = 'none';
+                sendOtpBtn.textContent = 'Send OTP';
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.style.opacity = '1';
+                successMsg.classList.remove('show');
+            }, 2000);
+        });
+    </script>
+
+</body>
+</html>

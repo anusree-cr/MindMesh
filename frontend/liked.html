@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book Now — GramWorks</title>
+  <style>
+    :root{
+      --primary:#2d6a4f;
+      --accent:#d4a574;
+      --muted:#7a7a7a;
+      --bg:#f6f6f4;
+      --card:#ffffff;
+      --radius:14px;
+      --shadow:0 6px 18px rgba(16,24,40,0.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:#111;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* Header / Search */
+    header.appbar{
+      background:linear-gradient(90deg,var(--primary),#4aa77a);
+      color:#fff;
+      padding:12px 16px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .home-link{
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 12px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.06);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .search {
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding-left:6px;
+    }
+    .search input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:40px;
+      border: none;
+      font-size:16px;
+      outline: none;
+      background: rgba(255,255,255,0.12);
+      color:#fff;
+    }
+    .search input::placeholder{ color: rgba(255,255,255,0.85); }
+
+    main{
+      flex:1;
+      padding:18px;
+      max-width:1100px;
+      margin:0 auto;
+      width:100%;
+    }
+
+    /* layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:18px;
+    }
+    @media(min-width:900px){
+      .grid{ grid-template-columns: 2fr 1fr; align-items:start; }
+    }
+
+    /* workers list */
+    .panel{
+      background:var(--card);
+      padding:14px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .panel h2{
+      margin:0 0 12px 0;
+      font-size:18px;
+      color:var(--primary);
+    }
+
+    #workersContainer{
+      display:grid;
+      gap:12px;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:12px;
+      padding:12px;
+      box-shadow:0 6px 18px rgba(16,24,40,0.06);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      position:relative;
+      border:1px solid rgba(16,24,40,0.03);
+    }
+    .card .title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .card h3{
+      margin:0;
+      font-size:1.05rem;
+      color:var(--primary);
+    }
+    .heart{
+      background:transparent;
+      border:none;
+      cursor:pointer;
+      font-size:20px;
+      width:40px;
+      height:40px;
+      border-radius:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:transform .15s;
+    }
+    .heart:hover{ transform:translateY(-3px) }
+    .heart.liked{ color:#e25555; }
+
+    .meta{ font-size:0.92rem; color:var(--muted); }
+    .meta strong{ color:#222; font-weight:600; }
+    .skills{ font-size:0.95rem; color:#2b5d3f; font-weight:600; }
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
+    .contact, .avail, .budget{ font-size:0.9rem; color:#333; }
+
+    /* right column - liked */
+    .right-col{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .liked-panel{ min-height:120px; }
+    .empty{ color:var(--muted); padding:18px; text-align:center; border-radius:10px; background:rgba(45,106,79,0.04); }
+
+    /* bottom nav */
+    nav.bottom{
+      position:sticky;
+      bottom:0;
+      left:0;
+      right:0;
+      background:#fff;
+      border-top:1px solid rgba(16,24,40,0.06);
+      display:flex;
+      justify-content:space-around;
+      padding:8px 0;
+      z-index:30;
+    }
+    nav.bottom a{
+      text-decoration:none;
+      color:var(--primary);
+      font-size:13px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+    }
+    nav.bottom a span.icon{ font-size:20px; }
+
+    /* small helpers */
+    .badge{
+      background:#e25555;color:#fff;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header class="appbar">
+    <a class="home-link" href="index.html" title="Home">🏠 Home</a>
+    <div class="search" style="max-width:760px;">
+      <input id="searchInput" type="search" placeholder="Search workers by name, skill or location..." aria-label="Search workers">
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button id="likedCountBtn" title="Liked workers" style="background:transparent;border:none;color:#fff;font-weight:700;display:flex;gap:8px;align-items:center;">
+        ❤️ <span id="likedCount" class="badge" style="background:#fff;color:var(--primary);">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="panel">
+        <h2>Available Workers</h2>
+        <div id="workersContainer" aria-live="polite"></div>
+      </section>
+
+      <aside class="right-col">
+        <div class="panel liked-panel" id="likedPanel">
+          <h2>Liked Workers</h2>
+          <div id="likedList">
+            <div class="empty">No liked workers yet. Tap the ❤️ on a worker card to add here.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Quick Filters</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="filterBtn" data-q="Plumbing">Plumbing</button>
+            <button class="filterBtn" data-q="Electrical">Electrical</button>
+            <button class="filterBtn" data-q="Carpentry">Carpentry</button>
+            <button class="filterBtn" data-q="Painting">Painting</button>
+            <button class="filterBtn" data-q="Tuition">Tuition</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <nav class="bottom" role="navigation" aria-label="Bottom navigation">
+    <a href="index.html" id="navHome"><span class="icon">🏠</span>Home</a>
+    <a href="#" id="navHistory"><span class="icon">📜</span>History</a>
+    <a href="#" id="navAccount"><span class="icon">👤</span>Account</a>
+    <a href="#" id="navLiked"><span class="icon">❤️</span>Liked</a>
+  </nav>
+
+  <script>
+    // Mock database - 10 Kerala workers
+    const workersDB = [
+      { id:1, name:"Nikhil Menon", age:32, skills:["Electrical","Wiring"], location:"Kochi", contact:{phone:"9447001122", email:"nikhil.m@kerala.com"}, previous:"Rewiring 20 houses in Ernakulam.", availability:"Mon‑Fri 8am‑6pm", budget:180 },
+      { id:2, name:"Aswathy Nair", age:28, skills:["Tuition","English","Maths"], location:"Thiruvananthapuram", contact:{phone:"9567123345", email:"aswathy.nair@kerala.com"}, previous:"Tutored 30 students at local tuition centre.", availability:"Tue‑Sat 3pm‑8pm", budget:200 },
+      { id:3, name:"Abdul Rahman", age:40, skills:["Plumbing","Pipe fitting"], location:"Kozhikode", contact:{phone:"9400123456", email:"abdul.r@kerala.com"}, previous:"Fixed leaks in over 50 apartments.", availability:"Mon‑Sat 7am‑5pm", budget:150 },
+      { id:4, name:"Anitha Joseph", age:35, skills:["Painting","Wall design"], location:"Thrissur", contact:{phone:"9495001234", email:"anitha.j@kerala.com"}, previous:"Completed murals in 10 schools.", availability:"Mon‑Fri 9am‑4pm", budget:160 },
+      { id:5, name:"Sreejith Pillai", age:30, skills:["Carpentry","Furniture making"], location:"Alappuzha", contact:{phone:"9633321110", email:"sreejith.p@kerala.com"}, previous:"Built custom cabinets and doors.", availability:"Mon‑Sat 8am‑3pm", budget:170 },
+      { id:6, name:"Lakshmi Prasad", age:27, skills:["Cleaning","Housekeeping"], location:"Palakkad", contact:{phone:"9847123456", email:"lakshmi.prasad@kerala.com"}, previous:"Managed housekeeping for 15 families.", availability:"Daily 6am‑2pm", budget:120 },
+      { id:7, name:"Ajith Kumar", age:38, skills:["AC Repair","Refrigeration"], location:"Kollam", contact:{phone:"9845012345", email:"ajith.k@kerala.com"}, previous:"Serviced air‑conditioners in 100+ homes.", availability:"Mon‑Fri 9am‑6pm", budget:190 },
+      { id:8, name:"Malini R", age:33, skills:["Gardening","Landscaping"], location:"Kannur", contact:{phone:"7594812345", email:"malini.r@kerala.com"}, previous:"Maintained gardens in 20 estates.", availability:"Mon‑Sat 6am‑2pm", budget:130 },
+      { id:9, name:"Binoy Varghese", age:45, skills:["Plumbing","Electrical"], location:"Thiruvalla", contact:{phone:"9446001234", email:"binoy.v@kerala.com"}, previous:"Handled mixed electrical/plumbing jobs.", availability:"Mon‑Fri 8am‑5pm", budget:160 },
+      { id:10, name:"Rekha Devi", age:29, skills:["Tuition","Science"], location:"Malappuram", contact:{phone:"9447123456", email:"rekha.d@kerala.com"}, previous:"Taught science to 25 students.", availability:"Tue‑Sat 4pm‑9pm", budget:190 }
+    ];
+
+    // State
+    let likedSet = new Set(JSON.parse(localStorage.getItem('likedWorkers')||'[]'));
+    const workersContainer = document.getElementById('workersContainer');
+    const likedListEl = document.getElementById('likedList');
+    const likedCountEl = document.getElementById('likedCount');
+    const searchInput = document.getElementById('searchInput');
+
+    // Render functions
+    function renderWorkers(list = workersDB){
+      workersContainer.innerHTML = '';
+      list.forEach(w => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="title">
+            <h3>${escapeHtml(w.name)}</h3>
+            <button class="heart ${likedSet.has(w.id)?'liked':''}" data-id="${w.id}" aria-label="Like ${escapeHtml(w.name)}">
+              ${ likedSet.has(w.id) ? '❤️' : '🤍' }
+            </button>
+          </div>
+          <div class="row">
+            <div class="skills">${escapeHtml(w.skills.join(', '))}</div>
+          </div>
+          <div class="meta"><strong>Location:</strong> ${escapeHtml(w.location)}</div>
+          <div class="contact"><strong>Phone:</strong> ${escapeHtml(w.contact.phone)} • <strong>Email:</strong> ${escapeHtml(w.contact.email)}</div>
+          <div class="avail"><strong>Availability:</strong> ${escapeHtml(w.availability)}</div>
+          <div class="budget"><strong>Rate:</strong> ₹${w.budget}/hr</div>
+        `;
+        workersContainer.appendChild(card);
+      });
+
+      // attach heart listeners
+      document.querySelectorAll('.heart').forEach(btn=>{
+        btn.onclick = () => {
+          const id = Number(btn.dataset.id);
+          toggleLike(id);
+        };
+      });
+    }
+
+    function renderLikedSection(){
+      likedListEl.innerHTML = '';
+      const likedIds = Array.from(likedSet);
+      if(likedIds.length === 0){
+        likedListEl.innerHTML = '<div class="empty">No liked workers yet. Tap the ❤️ on a worker card to add here.</div>';
+        likedCountEl.textContent = 0;
+        return;
+      }
+      likedCountEl.textContent = likedIds.length;
+      likedIds.forEach(id=>{
+        const w = workersDB.find(x=>x.id===id);
+        if(!w) return;
+        const c = document.createElement('div');
+        c.className = 'card';
+        c.style.marginBottom = '10px';
+        c.innerHTML = `
+          <div class="title">
+            <h3>${escapeHtml(w.name)}</h3>
+            <button class="heart liked" data-id="${w.id}" aria-label="Unlike ${escapeHtml(w.name)}">❤️</button>
+          </div>
+          <div class="meta"><strong>Skills:</strong> ${escapeHtml(w.skills.join(', '))}</div>
+          <div class="meta"><strong>Location:</strong> ${escapeHtml(w.location)}</div>
+          <div class="meta"><strong>Contact:</strong> ${escapeHtml(w.contact.phone)}</div>
+          <div class="meta"><strong>Rate:</strong> ₹${w.budget}/hr</div>
+        `;
+        likedListEl.appendChild(c);
+      });
+
+      // allow unlike from liked panel
+      likedListEl.querySelectorAll('.heart').forEach(btn=>{
+        btn.onclick = () => {
+          const id = Number(btn.dataset.id);
+          toggleLike(id);
+        };
+      });
+    }
+
+    function toggleLike(id){
+      if(likedSet.has(id)) likedSet.delete(id);
+      else likedSet.add(id);
+      // persist
+      localStorage.setItem('likedWorkers', JSON.stringify(Array.from(likedSet)));
+      renderWorkers(filteredWorkers());
+      renderLikedSection();
+    }
+
+    // Search & filters
+    function filteredWorkers(){
+      const q = searchInput.value.trim().toLowerCase();
+      if(!q) return workersDB;
+      return workersDB.filter(w=>{
+        if(w.name.toLowerCase().includes(q)) return true;
+        if(w.location.toLowerCase().includes(q)) return true;
+        if(w.skills.join(' ').toLowerCase().includes(q)) return true;
+        return false;
+      });
+    }
+
+    searchInput.addEventListener('input', ()=> {
+      renderWorkers(filteredWorkers());
+    });
+
+    // Quick filter buttons
+    document.querySelectorAll('.filterBtn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const q = btn.dataset.q.toLowerCase();
+        searchInput.value = q;
+        renderWorkers(filteredWorkers());
+      });
+    });
+
+    // bottom nav actions
+    document.getElementById('navLiked').addEventListener('click', (e)=>{
+      e.preventDefault();
+      document.querySelector('main').scrollIntoView({behavior:'smooth'});
+      // highlight liked panel area
+      const el = document.getElementById('likedPanel');
+      el.scrollIntoView({behavior:'smooth'});
+      el.animate([{boxShadow:'0 0 0 0 rgba(0,0,0,0)'},{boxShadow:'0 12px 28px rgba(45,106,79,0.12)'}],{duration:400,fill:'forwards'});
+    });
+
+    document.getElementById('navHome').addEventListener('click', (e)=>{
+      // default link navigates; keep behavior
+    });
+
+    // header liked button scroll
+    document.getElementById('likedCountBtn').addEventListener('click', ()=>{
+      document.getElementById('likedPanel').scrollIntoView({behavior:'smooth'});
+    });
+
+    // small XSS helper
+    function escapeHtml(str){
+      return String(str||'').replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[s]);
+    }
+
+    // initial render
+    renderWorkers();
+    renderLikedSection();
+  </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Register as Worker – GramWorks</title>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f5f5;color:#333;}
+    .container{max-width:960px;margin:0 auto;padding:20px;}
+    h1{color:#2d6a4f;text-align:center;margin-bottom:20px;}
+    form{background:#fff;padding:25px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1);}
+    .section{margin-bottom:25px;}
+    .section h2{font-size:1.3rem;color:#2d6a4f;margin-bottom:12px;border-bottom:1px solid #e0e0e0;padding-bottom:6px;}
+    .form-group{margin-bottom:16px;}
+    label{display:block;margin-bottom:6px;font-weight:600;}
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea{width:100%;padding:10px 14px;border:1px solid #ccc;border-radius:10px;font-size:1rem;transition:border-color .3s;}
+    input:focus,textarea:focus,select:focus{border-color:#52b788;outline:none;}
+    textarea{resize:vertical;min-height:80px;}
+    input[type="file"]{padding:.4rem;}
+    .btn{display:inline-block;padding:14px 30px;font-size:1rem;border:none;border-radius:25px;cursor:pointer;
+        background:#52b788;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);transition:background .3s,transform .3s;}
+    .btn:hover{background:#40916c;transform:translateY(-2px);}
+    .btn:active{transform:translateY(0);}
+    .preview{margin-top:8px;font-size:.9rem;color:#555;}
+    .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+    .thumbs img, .thumbs video{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #ccc;}
+    /* calendar */
+    .calendar-wrapper{overflow-x:auto;}
+    table.calendar{width:100%;border-collapse:collapse;margin-top:10px;}
+    table.calendar th, table.calendar td{width:14.28%;padding:8px;text-align:center;cursor:pointer;}
+    table.calendar th{background:#e0f2e9;color:#2d6a4f;font-weight:600;}
+    table.calendar td{border:1px solid #eee;}
+    table.calendar td.selectable:hover{background:#d4f7e0;}
+    table.calendar td.selected{background:#52b788;color:#fff;}
+    .hours-input{margin-top:8px;}
+    .hours-input input{width:100%;max-width:200px;}
+    /* worker cards */
+    #workerCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:20px;}
+    .worker-card{background:#fff;padding:16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);}
+    .worker-card h3{color:#2d6a4f;margin-bottom:6px;}
+    .worker-card p{font-size:.9rem;margin-bottom:4px;}
+    @media(max-width:600px){
+        .btn{width:100%;text-align:center;}
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Register as a Worker</h1>
+
+    <form id="regForm">
+        <!-- Personal -->
+        <div class="section">
+            <h2>Personal details</h2>
+            <div class="form-group">
+                <label for="name">Full name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" min="16" max="80" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" required></textarea>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="section">
+            <h2>Documents</h2>
+            <div class="form-group">
+                <label for="idproof">ID proof (Aadhaar)</label>
+                <input type="file" id="idproof" accept="image/*,application/pdf">
+                <div class="preview" id="idPreview"></div>
+            </div>
+            <div class="form-group">
+                <label for="pcc">Police Clearance Certificate</label>
+                <input type="file" id="pcc" accept="image/*,application/pdf">
+                <div class="preview" id="pccPreview"></div>
+            </div>
+        </div>
+
+        <!-- Work details -->
+        <div class="section">
+            <h2>Work details</h2>
+            <div class="form-group">
+                <label for="skills">Skills (comma separated)</label>
+                <input type="text" id="skills" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Work category/type</label>
+                <select id="category" required>
+                    <option value="">-- choose --</option>
+                    <option>Plumbing</option>
+                    <option>Electrical</option>
+                    <option>Carpentry</option>
+                    <option>Painting</option>
+                    <option>Tutoring</option>
+                    <option>Gardening</option>
+                    <option>Cooking</option>
+                    <option>Cleaning</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prevworks">Previous works description</label>
+                <textarea id="prevworks"></textarea>
+                <div class="thumbs" id="workThumbs"></div>
+                <input type="file" id="workFiles" accept="image/*,video/*" multiple>
+            </div>
+            <div class="form-group">
+                <label for="experience">Experience (years)</label>
+                <input type="number" id="experience" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label for="budget">Budget per hour (₹)</label>
+                <input type="number" id="budget" min="50" required>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="section">
+            <h2>Contact details</h2>
+            <div class="form-group">
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" pattern="[0-9]{10}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" id="email">
+            </div>
+        </div>
+
+        <!-- Location -->
+        <div class="section">
+            <h2>Location</h2>
+            <div class="form-group">
+                <label for="city">City / District</label>
+                <select id="city" required>
+                    <option value="">-- select --</option>
+                    <option>Kochi</option>
+                    <option>Thiruvananthapuram</option>
+                    <option>Kozhikode</option>
+                    <option>Thrissur</option>
+                    <option>Alappuzha</option>
+                    <option>Palakkad</option>
+                    <option>Kollam</option>
+                    <option>Kannur</option>
+                    <option>Malappuram</option>
+                    <option>Pathanamthitta</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="section">
+            <h2>Availability schedule</h2>
+            <div class="calendar-wrapper" id="calendarWrapper"></div>
+            <div class="hours-input" id="hoursInput" style="display:none;">
+                <label>Hours for <span id="selectedDate"></span></label>
+                <input type="text" id="dayHours" placeholder="e.g. 9am‑5pm">
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+    <!-- preview of registered workers -->
+    <section id="previewSection">
+        <h2>Registered Workers</h2>
+        <div id="workerCards"></div>
+    </section>
+</div>
+
+<script>
+    // mock database (Kerala workers)
+    const workers = [
+        {name:"Nikhil Menon", age:32, skills:["Electrician","Wiring"], location:"Kochi",
+         contact:{phone:"9447001122",email:"nikhil.m@kerala.com"},
+         previousWork:"Rewiring 20 houses in Ernakulam.", availability:{dates:[],hours:{}}, budgetPerHour:180},
+        {name:"Aswathy Nair", age:28, skills:["Home Tuition","English","Maths"], location:"Thiruvananthapuram",
+         contact:{phone:"9567123345",email:"aswathy.nair@kerala.com"},
+         previousWork:"Tutored 30 students at local tuition centre.", availability:{dates:[],hours:{}}, budgetPerHour:200},
+        {name:"Abdul Rahman", age:40, skills:["Plumbing","Pipe fitting"], location:"Kozhikode",
+         contact:{phone:"9400123456",email:"abdul.r@kerala.com"},
+         previousWork:"Fixed leaks in over 50 apartments.", availability:{dates:[],hours:{}}, budgetPerHour:150},
+        {name:"Anitha Joseph", age:35, skills:["Painting","Wall design"], location:"Thrissur",
+         contact:{phone:"9495001234",email:"anitha.j@kerala.com"},
+         previousWork:"Completed murals in 10 schools.", availability:{dates:[],hours:{}}, budgetPerHour:160},
+        {name:"Sreejith Pillai", age:30, skills:["Carpentry","Furniture making"], location:"Alappuzha",
+         contact:{phone:"9633321110",email:"sreejith.p@kerala.com"},
+         previousWork:"Built custom cabinets and doors.", availability:{dates:[],hours:{}}, budgetPerHour:170},
+        {name:"Lakshmi Prasad", age:27, skills:["Cleaning","Housekeeping"], location:"Palakkad",
+         contact:{phone:"9847123456",email:"lakshmi.prasad@kerala.com"},
+         previousWork:"Managed housekeeping for 15 families.", availability:{dates:[],hours:{}}, budgetPerHour:120},
+        {name:"Ajith Kumar", age:38, skills:["AC Repair","Refrigeration"], location:"Kollam",
+         contact:{phone:"9845012345",email:"ajith.k@kerala.com"},
+         previousWork:"Serviced air‑conditioners in 100+ homes.", availability:{dates:[],hours:{}}, budgetPerHour:190},
+        {name:"Malini R", age:33, skills:["Gardening","Landscaping"], location:"Kannur",
+         contact:{phone:"7594812345",email:"malini.r@kerala.com"},
+         previousWork:"Maintained gardens in 20 estates.", availability:{dates:[],hours:{}}, budgetPerHour:130},
+        {name:"Binoy Varghese", age:45, skills:["Plumbing","Electrical"], location:"Thiruvalla",
+         contact:{phone:"9446001234",email:"binoy.v@kerala.com"},
+         previousWork:"Handled mixed electrical/plumbing jobs.", availability:{dates:[],hours:{}}, budgetPerHour:160},
+        {name:"Rekha Devi", age:29, skills:["Home Tuition","Science"], location:"Malappuram",
+         contact:{phone:"9447123456",email:"rekha.d@kerala.com"},
+         previousWork:"Taught science to 25 students.", availability:{dates:[],hours:{}}, budgetPerHour:190}
+    ];
+
+    function renderWorkers(){
+        const container = document.getElementById('workerCards');
+        container.innerHTML = '';
+        workers.forEach(w=>{
+            const card=document.createElement('div');
+            card.className='worker-card';
+            card.innerHTML=`
+                <h3>${w.name}, ${w.age || ''}</h3>
+                <p><strong>Skills:</strong> ${w.skills.join(', ')}</p>
+                <p><strong>Category:</strong> ${w.category||'–'}</p>
+                <p><strong>Location:</strong> ${w.location}</p>
+                <p><strong>Phone:</strong> ${w.contact.phone}</p>
+                <p><strong>Email:</strong> ${w.contact.email||'–'}</p>
+                <p><strong>Budget:</strong> ₹${w.budgetPerHour}/hr</p>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // file preview helpers
+    function previewFile(input, target){
+        const preview = document.getElementById(target);
+        preview.textContent = '';
+        const file = input.files[0];
+        if(!file) return;
+        if(file.type.startsWith('image/')){
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.style.maxWidth = '100px';
+            preview.appendChild(img);
+        } else {
+            preview.textContent = file.name;
+        }
+    }
+    document.getElementById('idproof').addEventListener('change', e=>previewFile(e.target,'idPreview'));
+    document.getElementById('pcc').addEventListener('change', e=>previewFile(e.target,'pccPreview'));
+
+    document.getElementById('workFiles').addEventListener('change', function(){
+        const thumbs = document.getElementById('workThumbs');
+        thumbs.innerHTML = '';
+        Array.from(this.files).forEach(f=>{
+            if(f.type.startsWith('image/')){
+                const img=document.createElement('img');
+                img.src=URL.createObjectURL(f);
+                thumbs.appendChild(img);
+            }else if(f.type.startsWith('video/')){
+                const vid=document.createElement('video');
+                vid.src=URL.createObjectURL(f);
+                vid.controls=true;
+                thumbs.appendChild(vid);
+            } else {
+                const p=document.createElement('p');
+                p.textContent=f.name;
+                thumbs.appendChild(p);
+            }
+        });
+    });
+
+    // calendar
+    const today = new Date();
+    let selectedDate = null;
+    const availability = {}; // date => hours string
+
+    function generateCalendar(month, year){
+        const wrapper = document.getElementById('calendarWrapper');
+        wrapper.innerHTML='';
+        const tbl = document.createElement('table');
+        tbl.className='calendar';
+        const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const thead = document.createElement('thead');
+        const headRow = document.createElement('tr');
+        days.forEach(d=>{ const th=document.createElement('th'); th.textContent=d; headRow.appendChild(th); });
+        thead.appendChild(headRow);
+        tbl.appendChild(thead);
+        const firstDay = new Date(year,month,1).getDay();
+        const totalDays = new Date(year,month+1,0).getDate();
+        const tbody = document.createElement('tbody');
+        let row = document.createElement('tr');
+        for(let i=0;i<firstDay;i++){
+            row.appendChild(document.createElement('td'));
+        }
+        for(let d=1;d<=totalDays;d++){
+            if(row.children.length===7){
+                tbody.appendChild(row);
+                row=document.createElement('tr');
+            }
+            const cell = document.createElement('td');
+            cell.textContent=d;
+            cell.className='selectable';
+            const dateStr=`${year}-${month+1}-${d}`;
+            if(availability[dateStr]) cell.classList.add('selected');
+            cell.addEventListener('click',()=>{
+                selectedDate = dateStr;
+                document.getElementById('selectedDate').textContent = dateStr;
+                document.getElementById('hoursInput').style.display='block';
+                document.getElementById('dayHours').value = availability[dateStr]||'';
+            });
+            row.appendChild(cell);
+        }
+        while(row.children.length<7) row.appendChild(document.createElement('td'));
+        tbody.appendChild(row);
+        tbl.appendChild(tbody);
+        wrapper.appendChild(tbl);
+    }
+    document.getElementById('dayHours').addEventListener('input', function(){
+        if(selectedDate){
+            const val = this.value.trim();
+            if(val) availability[selectedDate]=val;
+            else delete availability[selectedDate];
+            generateCalendar(today.getMonth(), today.getFullYear());
+        }
+    });
+
+    // form submit
+    document.getElementById('regForm').addEventListener('submit',function(e){
+        e.preventDefault();
+        const w = {
+            name: document.getElementById('name').value.trim(),
+            age: document.getElementById('age').value,
+            address: document.getElementById('address').value.trim(),
+            skills: document.getElementById('skills').value.split(',').map(s=>s.trim()).filter(s=>s),
+            category: document.getElementById('category').value,
+            previousWork: document.getElementById('prevworks').value.trim(),
+            experience: document.getElementById('experience').value,
+            budgetPerHour: document.getElementById('budget').value,
+            contact:{phone: document.getElementById('phone').value,
+                     email: document.getElementById('email').value},
+            location: document.getElementById('city').value,
+            availability:{dates:Object.keys(availability),hours:Object.assign({},availability)}
+        };
+        workers.push(w);
+        renderWorkers();
+        this.reset();
+        document.getElementById('workThumbs').innerHTML='';
+        document.getElementById('idPreview').textContent='';
+        document.getElementById('pccPreview').textContent='';
+        availability = {};
+        generateCalendar(today.getMonth(), today.getFullYear());
+        document.getElementById('hoursInput').style.display='none';
+    });
+
+    // initial render
+    generateCalendar(today.getMonth(), today.getFullYear());
+    renderWorkers();
+</script>
+</body>
+</html>

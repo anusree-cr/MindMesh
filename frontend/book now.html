@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Book a Worker – GramWorks</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{
+            font-family:Arial,Helvetica,sans-serif;
+            background:#f5f5f5;
+            color:#333;
+            display:flex;
+            flex-direction:column;
+            min-height:100vh;
+        }
+        header{
+            background:#52b788;
+            color:#fff;
+            padding:12px 20px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+        header a.home{
+            color:#fff;
+            text-decoration:none;
+            font-weight:600;
+            margin-right:15px;
+        }
+        .search-wrap{
+            flex:1;
+        }
+        .search-wrap input{
+            width:100%;
+            padding:8px 12px;
+            border:none;
+            border-radius:20px;
+            font-size:1rem;
+        }
+        main.container{
+            flex:1;
+            padding:20px;
+        }
+        #workersContainer{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+            gap:20px;
+        }
+        .worker-card{
+            background:#fff;
+            border-radius:15px;
+            box-shadow:0 4px 10px rgba(0,0,0,0.08);
+            padding:16px;
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+        }
+        .worker-card h3{
+            color:#2d6a4f;
+            font-size:1.2rem;
+        }
+        .worker-card p{font-size:0.9rem;}
+        footer.bottom-nav{
+            background:#fff;
+            box-shadow:0 -2px 6px rgba(0,0,0,0.1);
+            display:flex;
+            justify-content:space-around;
+            padding:8px 0;
+        }
+        footer.bottom-nav a{
+            color:#2d6a4f;
+            text-decoration:none;
+            font-size:0.85rem;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+        }
+        footer.bottom-nav a span.icon{
+            font-size:1.4rem;
+            margin-bottom:4px;
+        }
+        @media(max-width:600px){
+            header{flex-direction:column;align-items:flex-start;}
+            .search-wrap{width:100%;margin-top:8px;}
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="home">🏠 Home</a>
+    <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Search workers by name or skill…">
+    </div>
+</header>
+
+<main class="container">
+    <div id="workersContainer"></div>
+</main>
+
+<footer class="bottom-nav">
+    <a href="index.html"><span class="icon">🏠</span>Home</a>
+    <a href="#"><span class="icon">📜</span>History</a>
+    <a href="#"><span class="icon">👤</span>Account</a>
+    <a href="liked.html"><span class="icon">❤️</span>Liked</a>
+</footer>
+
+<script>
+    const workers = [
+        {name:"Nikhil Menon",age:32,skills:["Electrician","Wiring"],
+         location:"Kochi",contact:{phone:"9447001122",email:"nikhil.m@kerala.com"},
+         previousWork:"Rewiring 20 houses in Ernakulam.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri"],hours:"8am‑6pm"},
+         budgetPerHour:180},
+        {name:"Aswathy Nair",age:28,skills:["Home Tuition","English","Maths"],
+         location:"Thiruvananthapuram",contact:{phone:"9567123345",email:"aswathy.nair@kerala.com"},
+         previousWork:"Tutored 30 students at local tuition centre.",
+         availability:{days:["Tue","Wed","Thu","Fri","Sat"],hours:"3pm‑8pm"},
+         budgetPerHour:200},
+        {name:"Abdul Rahman",age:40,skills:["Plumbing","Pipe fitting"],
+         location:"Kozhikode",contact:{phone:"9400123456",email:"abdul.r@kerala.com"},
+         previousWork:"Fixed leaks in over 50 apartments.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri","Sat"],hours:"7am‑5pm"},
+         budgetPerHour:150},
+        {name:"Anitha Joseph",age:35,skills:["Painting","Wall design"],
+         location:"Thrissur",contact:{phone:"9495001234",email:"anitha.j@kerala.com"},
+         previousWork:"Completed murals in 10 schools.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri"],hours:"9am‑4pm"},
+         budgetPerHour:160},
+        {name:"Sreejith Pillai",age:30,skills:["Carpentry","Furniture making"],
+         location:"Alappuzha",contact:{phone:"9633321110",email:"sreejith.p@kerala.com"},
+         previousWork:"Built custom cabinets and doors.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri","Sat"],hours:"8am‑3pm"},
+         budgetPerHour:170},
+        {name:"Lakshmi Prasad",age:27,skills:["Cleaning","Housekeeping"],
+         location:"Palakkad",contact:{phone:"9847123456",email:"lakshmi.prasad@kerala.com"},
+         previousWork:"Managed housekeeping for 15 families.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],hours:"6am‑2pm"},
+         budgetPerHour:120},
+        {name:"Ajith Kumar",age:38,skills:["AC Repair","Refrigeration"],
+         location:"Kollam",contact:{phone:"9845012345",email:"ajith.k@kerala.com"},
+         previousWork:"Serviced air‑conditioners in 100+ homes.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri"],hours:"9am‑6pm"},
+         budgetPerHour:190},
+        {name:"Malini R",age:33,skills:["Gardening","Landscaping"],
+         location:"Kannur",contact:{phone:"7594812345",email:"malini.r@kerala.com"},
+         previousWork:"Maintained gardens in 20 estates.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri","Sat"],hours:"6am‑2pm"},
+         budgetPerHour:130},
+        {name:"Binoy Varghese",age:45,skills:["Plumbing","Electrical"],
+         location:"Thiruvalla",contact:{phone:"9446001234",email:"binoy.v@kerala.com"},
+         previousWork:"Handled mixed electrical/plumbing jobs.",
+         availability:{days:["Mon","Tue","Wed","Thu","Fri"],hours:"8am‑5pm"},
+         budgetPerHour:160},
+        {name:"Rekha Devi",age:29,skills:["Home Tuition","Science"],
+         location:"Malappuram",contact:{phone:"9447123456",email:"rekha.d@kerala.com"},
+         previousWork:"Taught science to 25 students.",
+         availability:{days:["Tue","Wed","Thu","Fri","Sat"],hours:"4pm‑9pm"},
+         budgetPerHour:190}
+    ];
+
+    function render(list){
+        const container=document.getElementById('workersContainer');
+        container.innerHTML='';
+        list.forEach(w=>{
+            const card=document.createElement('div');
+            card.className='worker-card';
+            card.innerHTML=`
+                <h3>${w.name}</h3>
+                <p class="skills">${w.skills.join(', ')}</p>
+                <p><strong>Location:</strong> ${w.location}</p>
+                <p><strong>Phone:</strong> ${w.contact.phone}</p>
+                <p><strong>Email:</strong> ${w.contact.email}</p>
+                <p><strong>Avail:</strong> ${w.availability.days.join(', ')} (${w.availability.hours})</p>
+                <p><strong>Budget:</strong> ₹${w.budgetPerHour}/hr</p>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    document.getElementById('searchInput').addEventListener('input',function(){
+        const term=this.value.toLowerCase();
+        const filtered=workers.filter(w=>{
+            return w.name.toLowerCase().includes(term) ||
+                   w.skills.some(s=>s.toLowerCase().includes(term));
+        });
+        render(filtered);
+    });
+
+    render(workers);
+</script>
